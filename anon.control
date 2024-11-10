@@ -5,3 +5,4 @@ default_version = '@CARGO_VERSION@'
 relocatable = false
 superuser = true
 module_pathname = '$libdir/anon'
+trusted = true

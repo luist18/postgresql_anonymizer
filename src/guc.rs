@@ -4,6 +4,8 @@
 
 use pgrx::*;
 use std::ffi::CStr;
+use std::os::raw::c_void;
+use std::ptr::addr_of_mut;
 
 
 pub static ANON_DUMMY_LOCALE: GucSetting<Option<&'static CStr>> =
@@ -55,6 +57,16 @@ static ANON_MASK_SCHEMA: GucSetting<Option<&'static CStr>> =
     GucSetting::<Option<&'static CStr>>::new(Some(unsafe {
         CStr::from_bytes_with_nul_unchecked(b"mask\0")
     }));
+
+static mut ANON_ENABLED: bool = false;
+
+pub unsafe extern "C" fn assign_hook(newval: bool, _extra: *mut c_void) {
+    if newval {
+        if let Err(e) = Spi::run("SELECT anon.anonymize_database();") {
+            eprintln!("Error running anonymize_database: {:?}", e);
+        }
+    }
+}
 
 // Register the GUC parameters for the extension
 //
@@ -169,5 +181,16 @@ pub fn register_gucs() {
         GucFlags::default(),
     );
 
-
+    unsafe { pg_sys::DefineCustomBoolVariable(
+        PgMemoryContexts::TopMemoryContext.pstrdup("anon.enabled"),
+        PgMemoryContexts::TopMemoryContext.pstrdup("Enable anonymization"),
+        PgMemoryContexts::TopMemoryContext.pstrdup(""),
+        addr_of_mut!(ANON_ENABLED),
+        false,
+        GucContext::Suset as isize as _,
+        GucFlags::SUPERUSER_ONLY.bits(),
+        None,
+        Some(assign_hook),
+        None)
+    };
 }

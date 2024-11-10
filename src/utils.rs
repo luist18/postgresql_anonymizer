@@ -83,7 +83,7 @@ pub fn get_function_schema(function_call: String) -> String {
         // this is the equivalent of the linitial_node C macro
         // https://doxygen.postgresql.org/pg__list_8h.html#a213ac28ac83471f2a47d4e3918f720b4
         PgBox::from_pg(
-            pg_sys::pgrx_list_nth(raw_parsetree_list, 0)
+            pg_sys::list_nth(raw_parsetree_list, 0)
             as *mut pg_sys::RawStmt
         )
     };
@@ -94,7 +94,7 @@ pub fn get_function_schema(function_call: String) -> String {
 
     let restarget = unsafe {
         PgBox::from_pg(
-            pg_sys::pgrx_list_nth(stmt.targetList, 0)
+            pg_sys::list_nth(stmt.targetList, 0)
             as *mut pg_sys::ResTarget
         )
     };
@@ -119,7 +119,7 @@ pub fn get_function_schema(function_call: String) -> String {
         // is the schema name
         let schema_val = unsafe {
             PgBox::from_pg(
-                pg_sys::pgrx_list_nth(funcname.as_ptr(), 0)
+                pg_sys::list_nth(funcname.as_ptr(), 0)
                 as *mut compat::SchemaValue
             )
         };

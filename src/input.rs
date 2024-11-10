@@ -235,7 +235,7 @@ pub fn parse_expression(expr: &str) -> Result<PgBox<pg_sys::Node>,String>
         // this is the equivalent of the linitial_node C macro
         // https://doxygen.postgresql.org/pg__list_8h.html#a213ac28ac83471f2a47d4e3918f720b4
         PgBox::from_pg(
-            pg_sys::pgrx_list_nth(raw_parsetree_list.unwrap(), 0)
+            pg_sys::list_nth(raw_parsetree_list.unwrap(), 0)
             as *mut pg_sys::RawStmt
         )
     };
@@ -251,7 +251,7 @@ pub fn parse_expression(expr: &str) -> Result<PgBox<pg_sys::Node>,String>
 
     let restarget = unsafe {
         PgBox::from_pg(
-            pg_sys::pgrx_list_nth(stmt.targetList, 0)
+            pg_sys::list_nth(stmt.targetList, 0)
             as *mut pg_sys::ResTarget
         )
     };

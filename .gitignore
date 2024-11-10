@@ -53,3 +53,5 @@ dput
 **/*.rs.bk
 Cargo.lock
 .idea
+
+~postgres
